@@ -15,6 +15,12 @@ int main(int argc, char **argv){
     fs.open(argv[1], FileStorage::READ);
   }
   fs["depth"] >> image;
+  image = image/25; 
+  Size img_size = image.size();
+  cout << "image dimensions are" <<"height" <<  img_size.height << "width" <<img_size.width << endl;
+  cout << "Image = "<< endl << " "  << image << endl << endl;
+  imshow("Example Canny", image);
+  waitKey(0);
   return 0;
 }
 
