@@ -9,7 +9,7 @@ extern const int WIDTH;
 //
 const int X_GRAD_KERNEL[9] = {-1, 0, 1, -2, 0, 2, -1 , 0, 1};
 const int Y_GRAD_KERNEL[9] = {-1, -2, -1, 0 , 0, 0, 1, 2, 1};
-
+const int G_BLUR_KERNEL[9] = {1, 2, 1, 2, 4 , 2, 1, 2, 1};
 
 struct Coord {
   int x;
@@ -60,6 +60,23 @@ bool in_picture(Coord coord);
 Coord find_zero(int** completed);
 void color_regions(int **completed);
 int16_t **combine_grad(int16_t **x_grad, int16_t **y_grad);
+void free_2d(int16_t **pointer);
+void free_2d(int **pointer);
+
+
+void free_2d(int16_t **pointer){
+  for(int i = 0; i < HEIGHT; i++){
+    free(pointer[i]);
+        }
+  free(pointer);
+}
+
+void free_2d(int **pointer){
+  for(int i = 0; i < HEIGHT; i++){
+    free(pointer[i]);
+        }
+  free(pointer);
+}
 
 int make_regions(int16_t **grad, float diff){
   Coord first_out;
@@ -103,6 +120,7 @@ int make_regions(int16_t **grad, float diff){
   }
   cout << region_number << endl;
   color_regions(completed);
+  free_2d(completed);
   return 0;
   }
 
@@ -224,23 +242,35 @@ int main(int argc, char **argv){
   long long int result = 0;
   int16_t max = 0;
   int16_t min = 0;
-  //for(int i = 0; i < HEIGHT;i++){
-    //for(int j = 0; j < WIDTH; j++){
-    ////cout << x_grad[i][j] << " ";
+  //for(int i = 270; i < 370;i++){
+    //for(int j = 570; j < 630; j++){
+    ////cout << y_grad[i][j] << " ";
     //result += x_grad[i][j];
     //if(x_grad[i][j] > max){ max = x_grad[i][j];}
     //if(x_grad[i][j] < min){ min = x_grad[i][j];}
     //}
+    //cout << endl;
   //}
-  int16_t **grad = combine_grad(x_grad,y_grad);
-  float limit =5;
+  //int16_t **grad = combine_grad(x_grad,y_grad);
+  float limit =70;
+  Rect Rec(570, 270, 60, 100);
+  
   cout << "make_regions" <<endl;
-  make_regions(grad, limit);
+  //int normalization = 16;
+  //int16_t **x_blur =calculate_blur(image,G_BLUR_KERNEL, normalization); 
+  //make_regions(grad, limit);
+  make_regions(x_grad, limit);
+  //make_regions(y_grad, limit);
+  //make_regions(x_blur, limit);
   cout << "maximal element was:" << max << endl << "minimal element was: " << min << endl << "average is: " << result/(HEIGHT*WIDTH) << endl;
   Mat grey_image(HEIGHT, WIDTH, CV_8U, im_array);
+
+  rectangle(grey_image, Rec, Scalar(255), 1, 8, 0);
+  //Canny(grey_image, grey_image, 10, 100, 3, true);
   imshow("array", grey_image);
   waitKey(0);
-
+  free_2d(x_grad);
+  free_2d(y_grad);
   return 0;
 }
 
